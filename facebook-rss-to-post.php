@@ -13,6 +13,7 @@ Domain Path:       /lang
 /**
  * Define constants used by the plugin.
  */
+
 if (!defined('FB_RSS_PATH')) {
     define('FB_RSS_PATH', trailingslashit(plugin_dir_path(__FILE__)));
 }
@@ -36,18 +37,16 @@ if (!defined('FB_RSS_VERSION')) {
 
 // Set the constant path to the plugin's log file.
 if (!defined('FB_RSS_LOG_FILE')) {
-    define('FB_RSS_LOG_FILE', FB_RSS_PATH.'log', true);
+    define('FB_RSS_LOG_FILE', FB_RSS_PATH . 'log', true);
 }
 if (!defined('FB_RSS_LOG_FILE_EXT')) {
     define('FB_RSS_LOG_FILE_EXT', '.txt', true);
 }
 
 // the main loader class
-include_once( FB_RSS_INC. '/admin/class-fb-rss-to-post.php' );
-
-// initialise plugin as a global var
-global $fb_rss_to_post;
+include_once(FB_RSS_INC . '/admin/class-fb-rss-to-post.php');
+include_once(FB_RSS_INC . '/admin/class-fb-rss-to-post-listener.php');
+include_once(FB_RSS_INC . '/admin/class-fb-rss-to-post-engine-old.php');
+include_once(FB_RSS_INC . '/admin/class-fb-rss-to-post-engine.php');
 
 $fb_rss_to_post = new FbRssToPost();
-
-$fb_rss_to_post->init();

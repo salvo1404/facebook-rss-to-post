@@ -6,13 +6,12 @@
  */
 class FbRssToPost
 {
-
     /**
      * A var to store the options in
      *
      * @var array
      */
-    public $options = [];
+    public $options;
 
     /**
      * A var to store the link to the plugin page
@@ -33,7 +32,6 @@ class FbRssToPost
      */
     function __construct()
     {
-
         // populate the options first
         $this->load_options();
 
@@ -44,6 +42,11 @@ class FbRssToPost
         add_action('plugins_loaded', [$this, 'localize']);
 
         add_filter('plugin_action_links_' . FB_RSS_BASENAME, [$this, 'settings_link']);
+
+        // load the form processor
+        $this->processor = new FbRssToPostListener();
+
+        $this->init();
     }
 
     /**
@@ -67,7 +70,7 @@ class FbRssToPost
             'cache_deleted'         => true,
         ];
 
-        $options = get_option('rss_pi_feeds', []);
+        $options = get_option('fb_rss_feeds', []);
 
         // prepare default options when there is no record in the database
         if (!isset($options['feeds'])) {
@@ -111,6 +114,9 @@ class FbRssToPost
         // add to admin menu
         add_action('admin_menu', [$this, 'admin_menu']);
 
+        // process and save options prior to screen ui display
+        add_action('load-settings_page_fb_rss', array($this, 'save_options'));
+
         // load scripts and styles we need
         add_action('admin_enqueue_scripts', array($this, 'enqueue'));
 
@@ -146,13 +152,13 @@ class FbRssToPost
      */
     function admin_menu()
     {
-        add_options_page('Facebook Rss To Post', 'Facebook Rss To Post', 'manage_options', 'fb_rss', [$this, 'screen']);
+        add_options_page('Facebook Rss To Post', 'Facebook Rss To Post', 'manage_options', 'fb_rss', [$this, 'render']);
     }
 
     /**
      * Display the screen/ui
      */
-    function screen()
+    function render()
     {
         // it'll process any submitted form data
         // reload the options just in case
@@ -160,6 +166,16 @@ class FbRssToPost
 
         // include the template for the ui
         include(FB_RSS_PATH . 'templates/admin-ui.php');
+    }
+
+    /**
+     * save any options submitted before the screen/ui get displayed
+     */
+    function save_options() {
+
+        // load the form processor
+        $this->processor->process();
+
     }
 
     /**

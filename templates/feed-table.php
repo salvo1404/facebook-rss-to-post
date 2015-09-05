@@ -1,6 +1,11 @@
 <table class="widefat fb_rss-table" id="fb_rss-feed-table">
     <thead>
     <tr>
+        <th colspan="5"><?php _e('Import from Facebook', 'fb_rss'); ?></th>
+    </tr>
+    </thead>
+    <thead>
+    <tr>
         <th><?php _e("Feed name", 'fb_rss'); ?></th>
         <th><?php _e("Feed url", 'fb_rss'); ?></th>
         <th><?php _e("Max posts / import", 'fb_rss'); ?></th>

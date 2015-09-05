@@ -15,6 +15,10 @@
 
             <div id="poststuff">
                 <div id="post-body" class="metabox-holder columns-2">
+                    <div id="postbox-container-1" class="postbox-container">
+                        <?php include_once FB_RSS_PATH . 'templates/feed-save-box.php'; ?>
+                    </div>
+
                     <div id="postbox-container-2" class="postbox-container">
                         <?php
                         include_once FB_RSS_PATH . 'templates/feed-table.php';
@@ -28,5 +32,5 @@
         </form>
 
     </div>
-
+    <div class="ajax_content"></div>
 </div>

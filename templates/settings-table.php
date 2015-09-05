@@ -10,39 +10,6 @@
 				<table class="widefat edit-table">
 					<tr>
 						<td>
-							<label for="frequency"><?php _e('Frequency', "fb_rss"); ?></label>
-							<p class="description"><?php _e('How often will the import run.', "fb_rss"); ?></p>
-						</td>
-						<td>
-							<select name="frequency" id="frequency">
-								<?php $x = wp_get_schedules(); ?>
-								<?php foreach (array_keys($x) as $interval) : ?>
-									<option value="<?php echo $interval; ?>" <?php
-									if ($this->options['settings']['frequency'] == $interval) : echo('selected="selected"');
-									endif;
-									?>><?php echo $x[$interval]['display']; ?></option>
-										<?php endforeach; ?>
-							</select>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<label for="feeds_api_key"><?php _e('Full Text RSS Feed API Key', "fb_rss"); ?></label>
-							<?php if ( ! $this->is_key_valid ) : ?>
-							<p class="description">
-								<?php _e('Boost Your traffic with Full RSS Content - ', "fb_rss"); ?> 
-								Request a Free 14 Days <a href="http://www.feedsapi.com/?utm_source=rsspi-full-rss-key-here" target="_blank"> Full RSS Key Here !</a> 
-							</p>
-							<?php endif; ?>
-						</td>
-						<td>
-							<?php $feeds_api_key = isset($this->options['settings']["feeds_api_key"]) ? $this->options['settings']["feeds_api_key"] : ""; ?>
-							<input type="text" name="feeds_api_key" id="feeds_api_key" value="<?php echo $feeds_api_key; ?>" />
-						</td>
-					</tr>
-
-					<tr>
-						<td>
 							<label for="post_template"><?php _e('Template', 'fb_rss'); ?></label>
 							<p class="description"><?php _e('This is how the post will be formatted.', "fb_rss"); ?></p>
 							<p class="description">
@@ -69,7 +36,18 @@
 								?></textarea>
 						</td>
 					</tr>
-
+					<tr>
+						<td>
+							<?php _e('Import your JSON file with your feeds', "fb_rss"); ?>
+							<p class="description"><?php _e('Create and Import a JSON file with your Feeds', "fb_rss"); ?></p>
+						</td>
+						<td>
+							<?php
+							$disabled = '';
+							?>
+							<input type="file" name="import_json"<?php echo $disabled; ?> />
+						</td>
+					</tr>
 				</table>
 			</td>
 		</tr>
