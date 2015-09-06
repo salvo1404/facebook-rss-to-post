@@ -58,7 +58,19 @@ class FbRssToPostFormHandler
         }
 
         if (isset($_POST['facebook_submission'])) {
-            printf('posts imported and counting!ffffffffffffffffffffff' . $_POST['feed_name'], "fb_rss");
+            $response = wp_remote_get(
+                'https://graph.facebook.com/v2.4/' . 'news.com.au/feed?fields=id,name,picture&limit=10',
+                array(
+                    'headers'     => array('Authorization' => 'Bearer 640010092808045|o-nVSrr-QV02pWtJjhHxdli4r00'),
+                )
+            );
+            if (($response)) {
+                $json   = json_decode($response['body']); // use the content
+                $postImportedNumber = $this->engine->createPostsFromJson($json);
+
+                $this->printMessage($postImportedNumber);
+                //$body   = 'ciao';
+            }
         }
     }
 
