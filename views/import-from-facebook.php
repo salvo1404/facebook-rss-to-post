@@ -14,7 +14,7 @@
     <tbody class="rss-rows">
     <tr class="import-fb-input">
         <th><input type="text" name="feed_name" value=""/></th>
-        <th><input type="url" name="feed_url" value=""/></th>
+        <th><input type="text" name="feed_url" value=""/></th>
         <th><input type="number" name="max_posts"  value=""/></th>
     </tr>
     </tbody>

@@ -39,11 +39,22 @@ if (!defined('FB_RSS_VERSION')) {
 if (!defined('FB_RSS_LOG_FILE')) {
     define('FB_RSS_LOG_FILE', FB_RSS_PATH . 'log', true);
 }
-if (!defined('FB_RSS_LOG_FILE_EXT')) {
-    define('FB_RSS_LOG_FILE_EXT', '.txt', true);
+
+// Facebook API constants
+if (!defined('FB_RSS_API_KEY')) {
+    define('FB_RSS_API_KEY', 'Bearer 640010092808045|o-nVSrr-QV02pWtJjhHxdli4r00', true);
+}
+if (!defined('FB_RSS_API_URL')) {
+    define('FB_RSS_API_URL', 'https://graph.facebook.com/v2.4/', true);
+}
+if (!defined('FB_RSS_API_FIELDS')) {
+    define('FB_RSS_API_FIELDS', 'id,name,message,picture,type,link', true);
+}
+if (!defined('FB_RSS_API_MAX_POSTS')) {
+    define('FB_RSS_API_MAX_POSTS', '10', true);
 }
 
-// the main loader class
+// Includes
 include_once(FB_RSS_INC . '/admin/class-fb-rss-to-post.php');
 include_once(FB_RSS_INC . '/admin/class-fb-rss-to-post-form-handler.php');
 include_once(FB_RSS_INC . '/admin/class-fb-rss-to-post-engine.php');

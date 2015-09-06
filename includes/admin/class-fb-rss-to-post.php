@@ -26,9 +26,6 @@ class FbRssToPost
      */
     function __construct()
     {
-        // populate the options first
-        $this->load_options();
-
         // setup this plugin options page link
         $this->page_link = admin_url('options-general.php?page=fb_rss');
 
@@ -49,55 +46,6 @@ class FbRssToPost
 
         // load scripts and styles we need
         add_action('admin_enqueue_scripts', [$this, 'enqueue']);
-    }
-
-    /**
-     * Load options from the db
-     */
-    public function load_options()
-    {
-        $default_settings = [
-            'enable_logging'        => true,
-            'feeds_api_key'         => false,
-            'frequency'             => 0,
-            'post_template'         => "{\$content}\nSource: {\$feed_title}",
-            'post_status'           => 'publish',
-            'author_id'             => 1,
-            'allow_comments'        => 'open',
-            'block_indexing'        => false,
-            'nofollow_outbound'     => true,
-            'keywords'              => [],
-            'import_images_locally' => false,
-            'disable_thumbnail'     => false,
-            'cache_deleted'         => true,
-        ];
-
-        $options = get_option('fb_rss_feeds', []);
-
-        // prepare default options when there is no record in the database
-        if (!isset($options['feeds'])) {
-            $options['feeds'] = [];
-        }
-        if (!isset($options['settings'])) {
-            $options['settings'] = [];
-        }
-        if (!isset($options['latest_import'])) {
-            $options['latest_import'] = '';
-        }
-        if (!isset($options['imports'])) {
-            $options['imports'] = 0;
-        }
-        if (!isset($options['upgraded'])) {
-            $options['upgraded'] = [];
-        }
-
-        $options['settings'] = wp_parse_args($options['settings'], $default_settings);
-
-        if (!array_key_exists('imports', $options)) {
-            $options['imports'] = 0;
-        }
-
-        $this->options = $options;
     }
 
     /**
@@ -137,25 +85,6 @@ class FbRssToPost
      */
     function render()
     {
-        // it'll process any submitted form data
-        // reload the options just in case
-        $this->load_options();
-
-        // display a success message
-        if (isset($_GET['settings-updated']) || isset($_GET['import']) && @$_GET['settings-updated']) {
-            ?>
-            <div id="message" class="updated">
-                <?php
-                if (isset($_GET['settings-updated'])) {
-                    ?>
-                    <p><strong><?php _e('Settings saved.') ?></strong></p>
-                    <?php
-                }
-                ?>
-            </div>
-            <?php
-        }
-
         // include the template for the ui
         include(FB_RSS_PATH . '/views/index.php');
     }

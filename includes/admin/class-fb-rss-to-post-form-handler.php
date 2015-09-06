@@ -26,15 +26,14 @@ class FbRssToPostFormHandler
      */
     function handle()
     {
-        // if there's nothing to process
-        if (!isset($_POST['json_submission']) && !isset($_POST['facebook_submission'])) {
-            printf('posts imported and counting!ddddddddddddddddd', "fb_rss");
-
+        // Invalid nonce
+        if (!wp_verify_nonce($_POST['fb_rss_nonce'], 'settings_page')) {
             return;
         }
 
-        // Invalid nonce
-        if (!wp_verify_nonce($_POST['fb_rss_nonce'], 'settings_page')) {
+        // if there's nothing to process
+        if (!isset($_POST['json_submission']) && !isset($_POST['facebook_submission'])) {
+
             return;
         }
 
@@ -44,32 +43,30 @@ class FbRssToPostFormHandler
                 $file = file_get_contents($_FILES['import_json']['tmp_name']);
                 $json = json_decode($file);
 
-                @unlink($file);
-
                 // apply some json file validation:
 
                 $postImportedNumber = $this->engine->createPostsFromJson($json);
 
                 $this->printMessage($postImportedNumber);
-
-                //$feeds = $this->_parse_data( $json->data, $feeds );
-                //$this->options['feeds'] = $feeds;
             }
         }
 
+        // import from Facebook
         if (isset($_POST['facebook_submission'])) {
+            $feedUrl  = $_POST['feed_url'];
+            $maxPosts = $_POST['max_posts'] ?: FB_RSS_API_MAX_POSTS;
+            $query    = FB_RSS_API_URL . $feedUrl . '?fields=' . FB_RSS_API_FIELDS . '&limit=' . $maxPosts;
             $response = wp_remote_get(
-                'https://graph.facebook.com/v2.4/' . 'news.com.au/feed?fields=id,name,picture&limit=10',
-                array(
-                    'headers'     => array('Authorization' => 'Bearer 640010092808045|o-nVSrr-QV02pWtJjhHxdli4r00'),
+                $query,
+                array('headers' => array('Authorization' => FB_RSS_API_KEY),
                 )
             );
-            if (($response)) {
-                $json   = json_decode($response['body']); // use the content
+
+            if ($response) {
+                $json   = json_decode($response['body']);
                 $postImportedNumber = $this->engine->createPostsFromJson($json);
 
                 $this->printMessage($postImportedNumber);
-                //$body   = 'ciao';
             }
         }
     }
