@@ -2018,6 +2018,10 @@ a .icon-rotate-90:before, a .icon-rotate-180:before, a .icon-rotate-270:before, 
     border: 1px #eaeaea solid;
 }
 
+.import-fb-input th input{
+    margin: 0;
+}
+
 a.delete-row {
     color: #a00;
 }

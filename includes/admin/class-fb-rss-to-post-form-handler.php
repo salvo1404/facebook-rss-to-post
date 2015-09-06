@@ -26,41 +26,52 @@ class FbRssToPostFormHandler
      */
     function handle()
     {
-        // if there's nothing to process or invalid nonce
-        if (!isset($_POST['form_submission']) || !wp_verify_nonce($_POST['fb_rss_nonce'], 'settings_page')) {
+        // if there's nothing to process
+        if (!isset($_POST['json_submission']) && !isset($_POST['facebook_submission'])) {
             printf('posts imported and counting!ddddddddddddddddd', "fb_rss");
 
             return;
         }
 
+        // Invalid nonce
+        if (!wp_verify_nonce($_POST['fb_rss_nonce'], 'settings_page')) {
+            return;
+        }
+
         // import JSON file
-        if (isset($_FILES['import_json']) && is_uploaded_file($_FILES['import_json']['tmp_name'])) {
-            $file = file_get_contents($_FILES['import_json']['tmp_name']);
-            $json = json_decode($file);
+        if (isset($_POST['json_submission'])) {
+            if (isset($_FILES['import_json']) && is_uploaded_file($_FILES['import_json']['tmp_name'])) {
+                $file = file_get_contents($_FILES['import_json']['tmp_name']);
+                $json = json_decode($file);
 
-            @unlink($file);
+                @unlink($file);
 
-            // apply some json file validation:
+                // apply some json file validation:
 
-            $postImported = $this->engine->createPostsFromJson($json);
+                $postImportedNumber = $this->engine->createPostsFromJson($json);
 
-            $this->printMessage($postImported);
+                $this->printMessage($postImportedNumber);
 
-            //$feeds = $this->_parse_data( $json->data, $feeds );
-            //$this->options['feeds'] = $feeds;
+                //$feeds = $this->_parse_data( $json->data, $feeds );
+                //$this->options['feeds'] = $feeds;
+            }
+        }
+
+        if (isset($_POST['facebook_submission'])) {
+            printf('posts imported and counting!ffffffffffffffffffffff' . $_POST['feed_name'], "fb_rss");
         }
     }
 
     /**
      * This function prints a success message after importing
      *
-     * @param $postImported
+     * @param $postImportedNumber
      */
-    private function printMessage($postImported)
+    private function printMessage($postImportedNumber)
     {
         ?>
         <div id="message" class="updated">
-            <p><strong><?php _e($postImported . ' Posts Imported.') ?></strong></p>
+            <p><strong><?php _e($postImportedNumber . ' Posts Imported.') ?></strong></p>
         </div>
         <?php
     }

@@ -12,45 +12,11 @@
     </tr>
     </thead>
     <tbody class="rss-rows">
-    <?php
-    $saved_ids = [];
-
-    if (is_array($this->options['feeds']) && count($this->options['feeds']) > 0) :
-        foreach ($this->options['feeds'] as $f) :
-            $category = get_the_category($f['category_id']);
-            array_push($saved_ids, $f['id']);
-            include(FB_RSS_PATH . '/views/feed-table-row.php');
-        endforeach;
-    else :
-        ?>
-        <tr>
-            <td colspan="4" class="empty_table">
-                None
-            </td>
-        </tr>
-        <?php
-    endif
-    ?>
-    </tbody>
-    <tfoot>
-    <tr>
-        <td colspan="4">
-            <a href="#" class="button button-large button-primary add-row">
-                <?php _e('Add new feed', "fb_rss"); ?>
-            </a>
-            <input type="hidden" name="ids" id="ids" value="<?php echo(join($saved_ids, ',')); ?>"/>
-        </td>
+    <tr class="import-fb-input">
+        <th><input type="text" name="feed_name" value=""/></th>
+        <th><input type="url" name="feed_url" value=""/></th>
+        <th><input type="number" name="max_posts"  value=""/></th>
     </tr>
-    <?php
-    // preload an empty (and hidden by css) "new feed" row
-    unset($f);
-    include(FB_RSS_PATH . '/views/feed-table-row.php');
-    ?>
-    </tfoot>
-</table>
+    </tbody>
 
-<style>
-    .fb_rss-table tfoot tr.data-row, .fb_rss-table tfoot tr.edit-row {
-        display: none;
-    }
-</style>
+</table>

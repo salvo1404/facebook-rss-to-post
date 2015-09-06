@@ -72,21 +72,23 @@ class FbRssToPostEngine
             $wp_values['ID'] = $item->id;
         }
 
-        $wp_values['post_type'] = 'post';
+        if (isset($item->message)) {
+            $wp_values['post_content'] = $item->message;
+        }
 
-        $wp_values['post_status'] = 'publish';
+        if(isset($item->type)){
+            if($item->type === 'link'){
+
+            }
+        }
 
         if (isset($item->name)) {
             $wp_values['post_title'] = $item->name;
         }
 
-        if (isset($item->message)) {
-            $wp_values['post_content'] = $item->message;
-        }
+        $wp_values['post_type'] = 'post';
 
-        if (isset($item->author)) {
-            $wp_values['post_author'] = $item->author;
-        }
+        $wp_values['post_status'] = 'publish';
 
         if (isset($wp_values['ID'])) {
             $this->id = wp_update_post($wp_values);
