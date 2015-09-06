@@ -21,14 +21,8 @@ class FbRssToPost
     public $page_link;
 
     /**
-     * To initialise the admin and cron classes
+     * Start and Initialise
      *
-     * @var object
-     */
-    private $admin, $cron;
-
-    /**
-     * Start
      */
     function __construct()
     {
@@ -43,10 +37,18 @@ class FbRssToPost
 
         add_filter('plugin_action_links_' . FB_RSS_BASENAME, [$this, 'settings_link']);
 
-        // load the form processor
-        $this->processor = new FbRssToPostListener();
+        // Class instantiation
+        $this->engine  = new FbRssToPostEngine;
+        $this->handler = new FbRssToPostFormHandler($this->engine);
 
-        $this->init();
+        // add to admin menu
+        add_action('admin_menu', [$this, 'admin_menu']);
+
+        // handler form submissions in settings page
+        add_action('load-settings_page_fb_rss', [$this->handler, 'handle']);
+
+        // load scripts and styles we need
+        add_action('admin_enqueue_scripts', [$this, 'enqueue']);
     }
 
     /**
@@ -107,31 +109,6 @@ class FbRssToPost
     }
 
     /**
-     * Initialise
-     */
-    public function init()
-    {
-        // add to admin menu
-        add_action('admin_menu', [$this, 'admin_menu']);
-
-        // process and save options prior to screen ui display
-        add_action('load-settings_page_fb_rss', array($this, 'save_options'));
-
-        // load scripts and styles we need
-        add_action('admin_enqueue_scripts', array($this, 'enqueue'));
-
-        /*// initialise admin and cron
-        $this->cron = new rssPICron();
-        $this->cron->init();
-
-        $this->admin = new rssPIAdmin();
-        $this->admin->init();
-
-        $this->front = new rssPIFront();
-        $this->front->init();*/
-    }
-
-    /**
      * Adds a settings link
      *
      * @param array $links Existing links
@@ -164,27 +141,34 @@ class FbRssToPost
         // reload the options just in case
         $this->load_options();
 
+        // display a success message
+        if (isset($_GET['settings-updated']) || isset($_GET['import']) && @$_GET['settings-updated']) {
+            ?>
+            <div id="message" class="updated">
+                <?php
+                if (isset($_GET['settings-updated'])) {
+                    ?>
+                    <p><strong><?php _e('Settings saved.') ?></strong></p>
+                    <?php
+                }
+                ?>
+            </div>
+            <?php
+        }
+
         // include the template for the ui
-        include(FB_RSS_PATH . 'templates/admin-ui.php');
-    }
-
-    /**
-     * save any options submitted before the screen/ui get displayed
-     */
-    function save_options() {
-
-        // load the form processor
-        $this->processor->process();
-
+        include(FB_RSS_PATH . '/views/index.php');
     }
 
     /**
      * Enqueue our admin css and js
      *
      * @param string $hook The current screens hook
+     *
      * @return null
      */
-    public function enqueue($hook) {
+    public function enqueue($hook)
+    {
 
         // don't load if it isn't Facebook RSS screen
         if ($hook != 'settings_page_fb_rss') {
@@ -192,26 +176,34 @@ class FbRssToPost
         }
 
         // register scripts & styles
-        wp_enqueue_style('fb_rss', FB_RSS_URL . 'assets/css/style.css', array(), FB_RSS_VERSION);
+        wp_enqueue_style('fb_rss', FB_RSS_URL . 'assets/css/style.css', [], FB_RSS_VERSION);
 
-        wp_enqueue_style('fb_rss-jquery-ui-css', 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/themes/redmond/jquery-ui.css', array(), FB_RSS_VERSION);
+        wp_enqueue_style(
+            'fb_rss-jquery-ui-css',
+            'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/themes/redmond/jquery-ui.css',
+            [],
+            FB_RSS_VERSION
+        );
 
         wp_enqueue_script('jquery-ui-core');
         wp_enqueue_script('jquery-ui-datepicker');
         wp_enqueue_script('jquery-ui-progressbar');
 
-        wp_enqueue_script('modernizr', FB_RSS_URL . 'assets/js/modernizr.custom.32882.js', array(), FB_RSS_VERSION, true);
-        wp_enqueue_script('phpjs-uniqid', FB_RSS_URL . 'assets/js/uniqid.js', array(), FB_RSS_VERSION, true);
-        wp_enqueue_script('fb_rss', FB_RSS_URL . 'assets/js/main.js', array('jquery'), FB_RSS_VERSION, true);
+        wp_enqueue_script('modernizr', FB_RSS_URL . 'assets/js/modernizr.custom.32882.js', [], FB_RSS_VERSION, true);
+        wp_enqueue_script('phpjs-uniqid', FB_RSS_URL . 'assets/js/uniqid.js', [], FB_RSS_VERSION, true);
+        wp_enqueue_script('fb_rss', FB_RSS_URL . 'assets/js/main.js', ['jquery'], FB_RSS_VERSION, true);
 
         // localise ajaxuel for use
-        $localise_args = array(
-            'ajaxurl' => admin_url('admin-ajax.php'),
+        $localise_args = [
+            'ajaxurl'   => admin_url('admin-ajax.php'),
             'pluginurl' => FB_RSS_URL,
-            'l18n' => array(
-                'unsaved' => __( 'You have unsaved changes on this page. Do you want to leave this page and discard your changes or stay on this page?', 'fb_rss' )
-            )
-        );
+            'l18n'      => [
+                'unsaved' => __(
+                    'You have unsaved changes on this page. Do you want to leave this page and discard your changes or stay on this page?',
+                    'fb_rss'
+                )
+            ]
+        ];
         wp_localize_script('fb_rss', 'fb_rss', $localise_args);
     }
 }

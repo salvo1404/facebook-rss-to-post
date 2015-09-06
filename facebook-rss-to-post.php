@@ -45,8 +45,7 @@ if (!defined('FB_RSS_LOG_FILE_EXT')) {
 
 // the main loader class
 include_once(FB_RSS_INC . '/admin/class-fb-rss-to-post.php');
-include_once(FB_RSS_INC . '/admin/class-fb-rss-to-post-listener.php');
-include_once(FB_RSS_INC . '/admin/class-fb-rss-to-post-engine-old.php');
+include_once(FB_RSS_INC . '/admin/class-fb-rss-to-post-form-handler.php');
 include_once(FB_RSS_INC . '/admin/class-fb-rss-to-post-engine.php');
 
 $fb_rss_to_post = new FbRssToPost();

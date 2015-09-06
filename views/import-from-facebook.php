@@ -19,16 +19,13 @@
         foreach ($this->options['feeds'] as $f) :
             $category = get_the_category($f['category_id']);
             array_push($saved_ids, $f['id']);
-            include(FB_RSS_PATH . 'templates/feed-table-row.php');
+            include(FB_RSS_PATH . '/views/feed-table-row.php');
         endforeach;
     else :
         ?>
         <tr>
             <td colspan="4" class="empty_table">
-                <?php _e(
-                    'You haven\'t specified any feeds to import yet, why don\'t you <a href="#" class="add-row">add one now</a>?',
-                    "fb_rss"
-                ); ?>
+                None
             </td>
         </tr>
         <?php
@@ -47,7 +44,7 @@
     <?php
     // preload an empty (and hidden by css) "new feed" row
     unset($f);
-    include(FB_RSS_PATH . 'templates/feed-table-row.php');
+    include(FB_RSS_PATH . '/views/feed-table-row.php');
     ?>
     </tfoot>
 </table>
