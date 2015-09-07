@@ -13,11 +13,6 @@ class Validator
      */
     public function isValidFacebookSubmissionRequest(array $postRequest)
     {
-        if ($postRequest['page_name'] === "") {
-            $this->showError('empty_page_name', 'Facebook Page Name is required');
-
-            return false;
-        }
         if (stripos($postRequest['page_name'], 'http') === 0) {
             $this->showError('page_name_http', 'Please Insert Facebook Page Name Only');
 
