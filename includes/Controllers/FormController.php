@@ -3,6 +3,7 @@
 namespace Controllers;
 
 use Repositories\PostRepositoryInterface;
+use Validators\Validator;
 
 /**
  * Processes the admin screen form submissions
@@ -17,11 +18,18 @@ class FormController
     private $postRepository;
 
     /**
-     * @param PostRepositoryInterface $postRepository
+     * @var Validator
      */
-    function __construct(PostRepositoryInterface $postRepository)
+    private $validator;
+
+    /**
+     * @param PostRepositoryInterface $postRepository
+     * @param Validator               $validator
+     */
+    function __construct(PostRepositoryInterface $postRepository, Validator $validator)
     {
         $this->postRepository = $postRepository;
+        $this->validator      = $validator;
     }
 
     /**
@@ -40,7 +48,7 @@ class FormController
             return;
         }
 
-        // import JSON file
+        // import from JSON File Submission
         if (isset($_POST['json_submission'])) {
             if (isset($_FILES['import_json']) && is_uploaded_file($_FILES['import_json']['tmp_name'])) {
                 $file = file_get_contents($_FILES['import_json']['tmp_name']);
@@ -54,27 +62,45 @@ class FormController
             }
         }
 
-        // import from Facebook
-        if (isset($_POST['facebook_submission']) && $_POST['feed_url'] !== "") {
-            $feedUrl  = $_POST['feed_url'];
-            $maxPosts = $_POST['max_posts'] ?: FB_RSS_API_MAX_POSTS_DEFAULT;
-            $apiCall  = FB_RSS_API_URL . '/' . FB_RSS_API_VERSION . '/' .
-                $feedUrl . '/feed?fields=' . FB_RSS_API_FIELDS . '&limit=' . $maxPosts;
+        // import from Facebook Page Submission
+        if (isset($_POST['facebook_submission'])) {
+            if ($this->validator->isValidFacebookSubmissionRequest($_POST)) {
 
-            $response = wp_remote_get(
-                $apiCall,
-                [
-                    'headers' => ['Authorization' => FB_RSS_API_TOKEN],
-                ]
-            );
+                $response = $this->getFeedsFromFacebookPage($_POST);
 
-            if ($response) {
-                $json                = json_decode($response['body']);
-                $importedPostsNumber = $this->postRepository->createPostsFromJson($json);
+                if ($this->validator->isValidResponse($response)) {
+                    $json = json_decode($response['body']);
 
-                $this->printMessage($importedPostsNumber);
+                    if ($this->validator->isValidJsonFormat($json)) {
+                        $importedPostsNumber = $this->postRepository->createPostsFromJson($json);
+
+                        $this->printMessage($importedPostsNumber);
+                    }
+                }
             }
         }
+    }
+
+    /**
+     * @param array $postRequest
+     *
+     * @return mixed
+     */
+    private function getFeedsFromFacebookPage(array $postRequest)
+    {
+        $pageName = $postRequest['page_name'];
+        $maxPosts = $postRequest['max_posts'] ?: FB_RSS_API_MAX_POSTS_DEFAULT;
+        $apiCall  = FB_RSS_API_URL . '/' . FB_RSS_API_VERSION . '/' .
+            $pageName . '/feed?fields=' . FB_RSS_API_FIELDS . '&limit=' . $maxPosts;
+
+        $response = wp_remote_get(
+            $apiCall,
+            [
+                'headers' => ['Authorization' => FB_RSS_API_TOKEN],
+            ]
+        );
+
+        return $response;
     }
 
     /**
@@ -90,4 +116,6 @@ class FormController
         </div>
         <?php
     }
+
+
 }

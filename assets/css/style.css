@@ -2003,7 +2003,7 @@ a .icon-rotate-90:before, a .icon-rotate-180:before, a .icon-rotate-270:before, 
 }
 
 .fb_rss-feed_name,
-.fb_rss-feed_url {
+.fb_rss-page_name {
     word-break: break-all;
 }
 

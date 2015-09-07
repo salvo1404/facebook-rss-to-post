@@ -58,8 +58,6 @@ include_once(FB_RSS_INC . '/Admin/FacebookRssToPost.php');
 include_once(FB_RSS_INC . '/Controllers/FormController.php');
 include_once(FB_RSS_INC . '/Repositories/PostRepositoryInterface.php');
 include_once(FB_RSS_INC . '/Repositories/PostRepository.php');
-include_once(FB_RSS_INC . '/Validators/RequestValidator.php');
-include_once(FB_RSS_INC . '/Validators/JsonSubmissionRequestValidator.php');
-include_once(FB_RSS_INC . '/Validators/FacebookSubmissionRequestValidator.php');
+include_once(FB_RSS_INC . '/Validators/Validator.php');
 
 $fb_rss_to_post = new FacebookRssToPost;

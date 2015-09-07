@@ -4,6 +4,7 @@ namespace Admin;
 
 use Controllers\FormController;
 use Repositories\PostRepository;
+use Validators\Validator;
 
 /**
  * Main Class
@@ -34,23 +35,27 @@ class FacebookRssToPost
         // setup this plugin options page link
         $this->page_link = admin_url('options-general.php?page=fb_rss');
 
+        // Add setting link
         add_filter('plugin_action_links_' . FB_RSS_BASENAME, [$this, 'settings_link']);
 
+        // Slow Connection Timeout issue workaround
+        add_filter('http_response_timeout', [$this, 'wpdocs_http_response_timeout']);
+
         // Class instantiation
-        $this->formController = new FormController(new PostRepository);
+        $this->formController = new FormController(new PostRepository, new Validator);
 
         // add to admin menu
         add_action('admin_menu', [$this, 'admin_menu']);
 
-        // handler form submissions in settings page
+        // handler Settings Page Form Submissions
         add_action('load-settings_page_fb_rss', [$this->formController, 'handle']);
 
-        // load scripts and styles we need
+        // load CSS style
         add_action('admin_enqueue_scripts', [$this, 'enqueue']);
     }
 
     /**
-     * Adds a settings link
+     * This function adds a settings link
      *
      * @param array $links Existing links
      *
@@ -66,6 +71,19 @@ class FacebookRssToPost
     }
 
     /**
+     * This function resolves the issue of Timeout being reached during Facebook API calls
+     * for slow connections
+     *
+     * @param $timeout
+     *
+     * @return int
+     */
+    public function wpdocs_extend_http_response_timeout($timeout)
+    {
+        return 10;
+    }
+
+    /**
      * Add to admin menu
      */
     function admin_menu()
@@ -74,11 +92,10 @@ class FacebookRssToPost
     }
 
     /**
-     * Display the screen/ui
+     * This functions displays the screen/ui Settings Page
      */
     function render()
     {
-        // include the template for the ui
         include(FB_RSS_PATH . '/views/index.php');
     }
 
@@ -91,12 +108,11 @@ class FacebookRssToPost
      */
     public function enqueue($hook)
     {
-        // don't load if it isn't Facebook RSS screen
+        // don't load if it isn't Facebook RSS to Post screen
         if ($hook != 'settings_page_fb_rss') {
             return;
         }
 
-        // register CSS
         wp_enqueue_style('fb_rss', FB_RSS_URL . 'assets/css/style.css', [], FB_RSS_VERSION);
     }
 }
