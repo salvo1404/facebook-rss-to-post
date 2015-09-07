@@ -59,7 +59,7 @@ class FormController
             $feedUrl  = $_POST['feed_url'];
             $maxPosts = $_POST['max_posts'] ?: FB_RSS_API_MAX_POSTS_DEFAULT;
             $apiCall  = FB_RSS_API_URL . '/' . FB_RSS_API_VERSION . '/' .
-                $feedUrl . '?fields=' . FB_RSS_API_FIELDS . '&limit=' . $maxPosts;
+                $feedUrl . '/feed?fields=' . FB_RSS_API_FIELDS . '&limit=' . $maxPosts;
 
             $response = wp_remote_get(
                 $apiCall,
