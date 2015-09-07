@@ -1,0 +1,6 @@
+<?php
+
+abstract class RequestValidator
+{
+
+}

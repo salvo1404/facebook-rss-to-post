@@ -7,7 +7,6 @@ Version:           1.0.0
 Author:            Salvatore Balzano
 Author URI:        https://github.com/salvo1404
 License:           GPLv2 or later
-Domain Path:       /lang
 */
 
 /**
@@ -50,13 +49,14 @@ if (!defined('FB_RSS_API_URL')) {
 if (!defined('FB_RSS_API_FIELDS')) {
     define('FB_RSS_API_FIELDS', 'id,name,message,picture,type,link', true);
 }
-if (!defined('FB_RSS_API_MAX_POSTS')) {
-    define('FB_RSS_API_MAX_POSTS', '10', true);
+if (!defined('FB_RSS_API_MAX_POSTS_DEFAULT')) {
+    define('FB_RSS_API_MAX_POSTS_DEFAULT', '10', true);
 }
 
 // Includes
-include_once(FB_RSS_INC . '/admin/class-fb-rss-to-post.php');
-include_once(FB_RSS_INC . '/admin/class-fb-rss-to-post-form-handler.php');
-include_once(FB_RSS_INC . '/admin/class-fb-rss-to-post-engine.php');
+include_once(FB_RSS_INC . '/Admin/FacebookRssToPost.php');
+include_once(FB_RSS_INC . '/Controllers/FormController.php');
+include_once(FB_RSS_INC . '/Repositories/PostRepositoryInterface.php');
+include_once(FB_RSS_INC . '/Repositories/PostRepository.php');
 
-$fb_rss_to_post = new FbRssToPost();
+$fb_rss_to_post = new FacebookRssToPost();
