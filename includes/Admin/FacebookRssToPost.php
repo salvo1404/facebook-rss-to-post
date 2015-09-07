@@ -1,5 +1,10 @@
 <?php
 
+namespace Admin;
+
+use Controllers\FormController;
+use Repositories\PostRepository;
+
 /**
  * Main Class
  *

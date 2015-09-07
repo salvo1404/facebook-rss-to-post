@@ -1,5 +1,9 @@
 <?php
 
+namespace Controllers;
+
+use Repositories\PostRepositoryInterface;
+
 /**
  * Processes the admin screen form submissions
  *

@@ -9,6 +9,8 @@ Author URI:        https://github.com/salvo1404
 License:           GPLv2 or later
 */
 
+use Admin\FacebookRssToPost;
+
 /**
  * Define constants used by the plugin.
  */
@@ -60,4 +62,4 @@ include_once(FB_RSS_INC . '/Validators/RequestValidator.php');
 include_once(FB_RSS_INC . '/Validators/JsonSubmissionRequestValidator.php');
 include_once(FB_RSS_INC . '/Validators/FacebookSubmissionRequestValidator.php');
 
-$fb_rss_to_post = new FacebookRssToPost();
+$fb_rss_to_post = new FacebookRssToPost;

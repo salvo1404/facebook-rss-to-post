@@ -8,7 +8,7 @@ Stable Tag:
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-This plugin allows you to import RSS and Atom feeds from your favourite Facebook page and transform items to Wordpress's posts.
+This plugin allows you to import RSS feeds from your favourite Facebook page and transform items to Wordpress's posts.
 
 == Description ==
 

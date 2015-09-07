@@ -1,5 +1,7 @@
 <?php
 
+namespace Repositories;
+
 class PostRepository implements PostRepositoryInterface
 {
     var $id;              // Integer
