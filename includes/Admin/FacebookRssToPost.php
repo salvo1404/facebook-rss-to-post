@@ -91,7 +91,7 @@ class FacebookRssToPost
             return;
         }
 
-        // register styles
+        // register CSS
         wp_enqueue_style('fb_rss', FB_RSS_URL . 'assets/css/style.css', [], FB_RSS_VERSION);
     }
 }

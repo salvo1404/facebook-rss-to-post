@@ -51,18 +51,21 @@ class FormController
         }
 
         // import from Facebook
-        if (isset($_POST['facebook_submission']) && $_POST['feed_url'] !== "" ) {
+        if (isset($_POST['facebook_submission']) && $_POST['feed_url'] !== "") {
             $feedUrl  = $_POST['feed_url'];
             $maxPosts = $_POST['max_posts'] ?: FB_RSS_API_MAX_POSTS_DEFAULT;
-            $query    = FB_RSS_API_URL . $feedUrl . '?fields=' . FB_RSS_API_FIELDS . '&limit=' . $maxPosts;
+            $apiCall  = FB_RSS_API_URL . '/' . FB_RSS_API_VERSION . '/' .
+                $feedUrl . '?fields=' . FB_RSS_API_FIELDS . '&limit=' . $maxPosts;
+
             $response = wp_remote_get(
-                $query,
-                array('headers' => array('Authorization' => FB_RSS_API_KEY),
-                )
+                $apiCall,
+                [
+                    'headers' => ['Authorization' => FB_RSS_API_TOKEN],
+                ]
             );
 
             if ($response) {
-                $json   = json_decode($response['body']);
+                $json                = json_decode($response['body']);
                 $importedPostsNumber = $this->postRepository->createPostsFromJson($json);
 
                 $this->printMessage($importedPostsNumber);

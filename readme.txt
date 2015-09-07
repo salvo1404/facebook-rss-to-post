@@ -2,6 +2,7 @@
 Contributors: salvo1404
 Tags: post, feed, , facebook, auto
 Requires at least: 3.5
+Require: PHP 5.4+
 Tested up to: 4.2.4
 Stable Tag:
 License: GPLv2 or later
