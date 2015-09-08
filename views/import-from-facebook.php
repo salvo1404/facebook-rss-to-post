@@ -22,7 +22,7 @@
     </thead>
     <tbody class="rss-rows">
     <tr class="import-fb-input">
-        <th><input type="text" name="page_name" placeholder="Page Name" required/></th>
+        <th><input type="text" name="page_name" placeholder="Page Name"/></th>
         <th><input type="number" name="max_posts" min="1" placeholder="Max Posts"/></th>
     </tr>
     </tbody>

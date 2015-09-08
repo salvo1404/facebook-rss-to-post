@@ -1,9 +1,9 @@
 <?php
 
-namespace Controllers;
+namespace includes\Controllers;
 
-use Repositories\PostRepositoryInterface;
-use Validators\Validator;
+use includes\Repositories\PostRepositoryInterface;
+use includes\Validators\Validator;
 
 /**
  * Processes the admin screen form submissions
@@ -50,38 +50,78 @@ class FormController
 
         // import from JSON File Submission
         if (isset($_POST['json_submission'])) {
-            if (isset($_FILES['import_json']) && is_uploaded_file($_FILES['import_json']['tmp_name'])) {
-                $file = file_get_contents($_FILES['import_json']['tmp_name']);
-                $json = json_decode($file);
 
-                // apply some json file validation:
+            if (!$this->validator->validateJsonRequestFiles($_FILES)) {
+                $this->respondWithError('file_not_found', 'Please Upload a Json File');
 
-                $importedPostsNumber = $this->postRepository->createPostsFromJson($json);
-
-                $this->printMessage($importedPostsNumber);
+                return;
             }
+
+            $file = file_get_contents($_FILES['import_json']['tmp_name']);
+
+            if (!$json = json_decode($file)) {
+                $this->respondWithError('invalid_json', 'Please Upload a valid Json File');
+
+                return;
+            }
+
+            if ($error = $this->validator->jsonContainsError($json)) {
+                $this->respondWithError('response_error', $error->message);
+
+                return;
+            }
+            if (!$this->validator->validateJsonFormat($json)) {
+                $this->respondWithError('invalid_json', 'Malformed Json Received from Facebook API');
+
+                return;
+            }
+
+            $importedPostsNumber = $this->postRepository->createPostsFromJson($json);
+
+            $this->respondWithSuccess($importedPostsNumber);
+
         }
 
         // import from Facebook Page Submission
         if (isset($_POST['facebook_submission'])) {
-            if ($this->validator->isValidFacebookSubmissionRequest($_POST)) {
 
-                $response = $this->getFeedsFromFacebookPage($_POST);
+            if (!$this->validator->validateFacebookSubmissionRequest($_POST)) {
+                $this->respondWithError('page_name_http', 'Please Insert Facebook Page Name Only');
 
-                if ($this->validator->isValidResponse($response)) {
-                    $json = json_decode($response['body']);
-
-                    if ($this->validator->isValidJsonFormat($json)) {
-                        $importedPostsNumber = $this->postRepository->createPostsFromJson($json);
-
-                        $this->printMessage($importedPostsNumber);
-                    }
-                }
+                return;
             }
+
+            $response = $this->getFeedsFromFacebookPage($_POST);
+
+            if (!$this->validator->validateResponse($response)) {
+                $this->respondWithError('invalid_response', 'Response or WP_error on failure');
+
+                return;
+            }
+
+            $json = json_decode($response['body']);
+
+            if ($error = $this->validator->jsonContainsError($json)) {
+                $this->respondWithError('response_error', $error->message);
+
+                return;
+            }
+            if (!$this->validator->validateJsonFormat($json)) {
+                $this->respondWithError('invalid_json', 'Malformed Json Received from Facebook API');
+
+                return;
+            }
+
+            $importedPostsNumber = $this->postRepository->createPostsFromJson($json);
+
+            $this->respondWithSuccess($importedPostsNumber);
+
         }
     }
 
     /**
+     * This function makes the request to Facebook API
+     *
      * @param array $postRequest
      *
      * @return mixed
@@ -108,7 +148,7 @@ class FormController
      *
      * @param $importedPostsNumber
      */
-    private function printMessage($importedPostsNumber)
+    private function respondWithSuccess($importedPostsNumber)
     {
         ?>
         <div id="message" class="updated">
@@ -117,5 +157,20 @@ class FormController
         <?php
     }
 
+    /**
+     * This function defines the settings error to display
+     *
+     * @param $error_slug
+     * @param $message
+     */
+    private function respondWithError($error_slug, $message)
+    {
+        add_settings_error(
+            $error_slug,
+            '',
+            $message,
+            'error'
+        );
+    }
 
 }

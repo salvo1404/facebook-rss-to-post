@@ -1,6 +1,6 @@
 <?php
 
-namespace Repositories;
+namespace includes\Repositories;
 
 class PostRepository implements PostRepositoryInterface
 {

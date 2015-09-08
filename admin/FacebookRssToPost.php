@@ -1,10 +1,10 @@
 <?php
 
-namespace Admin;
+namespace admin;
 
-use Controllers\FormController;
-use Repositories\PostRepository;
-use Validators\Validator;
+use includes\Controllers\FormController;
+use includes\Repositories\PostRepository;
+use includes\Validators\Validator;
 
 /**
  * Main Class

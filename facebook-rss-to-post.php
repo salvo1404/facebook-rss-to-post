@@ -54,7 +54,7 @@ if (!defined('FB_RSS_API_MAX_POSTS_DEFAULT')) {
 }
 
 // Includes
-include_once(FB_RSS_INC . '/Admin/FacebookRssToPost.php');
+include_once('admin/FacebookRssToPost.php');
 include_once(FB_RSS_INC . '/Controllers/FormController.php');
 include_once(FB_RSS_INC . '/Repositories/PostRepositoryInterface.php');
 include_once(FB_RSS_INC . '/Repositories/PostRepository.php');
