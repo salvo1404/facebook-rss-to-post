@@ -4,100 +4,213 @@ namespace includes\Repositories;
 
 class PostRepository implements PostRepositoryInterface
 {
-    var $id;              // Integer
-    var $type;            // String
-    var $slug;            // String
-    var $url;             // String
-    var $status;          // String ("draft", "published", or "pending")
-    var $title;           // String
-    var $title_plain;     // String
-    var $content;         // String (modified by read_more query var)
-    var $excerpt;         // String
-    var $date;            // String (modified by date_format query var)
-    var $modified;        // String (modified by date_format query var)
-    var $categories;      // Array of objects
-    var $tags;            // Array of objects
-    var $author;          // Object
-    var $comments;        // Array of objects
-    var $attachments;     // Array of objects
-    var $comment_count;   // Integer
-    var $comment_status;  // String ("open" or "closed")
-    var $thumbnail;       // String
-    var $custom_fields;   // Object (included by using custom_fields query var)
-
     /**
+     * This function parses the given json object
+     * and creates one post per item.
+     * Items need to be wrapped
+     * into a data namespace.
+     *
      * @param $json
      *
      * @return int
      */
     public function createPostsFromJson($json)
     {
-        // apply some data validation
-
-        $count = 0;
-        foreach ($json->data as $dataItem) {
-            $this->createPost($dataItem);
-            $count += 1;
+        $postCreated = 0;
+        foreach ($json->data as $item) {
+            if ($this->createPost($item)) {
+                $postCreated += 1;
+            }
         }
 
-        return $count;
+        return $postCreated;
     }
 
     /**
+     * This function initialises a new Post
+     * The post will be created only if
+     * type = link, video, photo
+     *
      * @param $item
      *
      * @return mixed
      */
-    private function createPost($item)
+    public function createPost($item)
     {
-        unset($item->id);
-
-        if (empty($item) || !isset($item->name)) {
-            $item = [
-                'title'   => 'Untitled',
-                'content' => ''
-            ];
+        if (!isset($item->type)) {
+            return false;
         }
 
-        return $this->savePost($item);
+        switch ($item->type) {
+            case 'link':
+                return $this->createLinkPost($item);
+            case 'photo':
+                return $this->createPhotoPost($item);
+            case 'video':
+                return $this->createVideoPost($item);
+        }
+
     }
 
-    private function savePost($item)
+    /**
+     * This function creates a link Post
+     *
+     * @param $item
+     *
+     * @return bool
+     */
+    private function createLinkPost($item)
     {
-        $wp_values = [];
+        $wp_values                 = [];
+        $wp_values['post_content'] = '';
 
-        if (isset($item->id)) {
-            $wp_values['ID'] = $item->id;
+        if (!isset($item->name)) {
+            $wp_values['post_title'] = 'Untitled';
+        } else {
+            $wp_values['post_title'] = $item->name;
+        }
+
+        if (isset($item->message)) {
+            $wp_values['post_content'] = $item->message . ' ' .
+                '<br><br><a href="' . $item->link . '"><strong>READ MORE</strong></a>';
+        }
+
+        $wp_values['post_status'] = 'publish';
+        $wp_values['post_type']   = 'post';
+
+        if (isset($item->picture)) {
+            $pictureLocalPath = download_url($item->picture);
+            if (!is_wp_error($pictureLocalPath)) {
+                $wp_values['post_content'] = $this->addImageToPost($pictureLocalPath, $wp_values['post_content']);
+            }
+        }
+
+        if (!$postId = $this->save($wp_values)) {
+            return false;
+        }
+
+        return $postId;
+    }
+
+    /**
+     * This function creates a photo Post
+     *
+     * @param $item
+     *
+     * @return bool
+     */
+    private function createPhotoPost($item)
+    {
+        $wp_values                 = [];
+        $wp_values['post_content'] = '';
+
+        if (!isset($item->name)) {
+            $wp_values['post_title'] = 'Untitled - Photo';
+        } else {
+            $wp_values['post_title'] = $item->name;
         }
 
         if (isset($item->message)) {
             $wp_values['post_content'] = $item->message;
         }
 
-        if(isset($item->type)){
-            if($item->type === 'link'){
+        $wp_values['post_status'] = 'publish';
+        $wp_values['post_type']   = 'post';
 
+        if (isset($item->picture)) {
+            $pictureLocalPath = download_url($item->picture);
+            if (!is_wp_error($pictureLocalPath)) {
+                $wp_values['post_content'] = $this->addImageToPost($pictureLocalPath, $wp_values['post_content']);
             }
         }
 
-        if (isset($item->name)) {
+        if (!$postId = $this->save($wp_values)) {
+            return false;
+        }
+
+        return $postId;
+    }
+
+    /**
+     * This function creates a video Post
+     *
+     * @param $item
+     *
+     * @return bool
+     */
+    private function createVideoPost($item)
+    {
+        $wp_values                 = [];
+        $wp_values['post_content'] = '';
+
+        if (!isset($item->name)) {
+            $wp_values['post_title'] = 'Untitled - Video';
+        } else {
             $wp_values['post_title'] = $item->name;
         }
 
-        $wp_values['post_type'] = 'post';
-
-        $wp_values['post_status'] = 'publish';
-
-        if (isset($wp_values['ID'])) {
-            $this->id = wp_update_post($wp_values);
-        } else {
-            $this->id = wp_insert_post($wp_values);
+        if (isset($item->message)) {
+            $wp_values['post_content'] = $item->message;
         }
 
-        //$wp_post = get_post($this->id);
-        //$this->import_wp_object($wp_post);
+        if (isset($item->link)) {
+            $wp_values['post_content'] = $wp_values['post_content'] . ' ' .
+                '<br><br><a href="' . $item->link . '"><strong>WATCH VIDEO</strong></a>';
+        }
 
-        return $this->id;
+        $wp_values['post_status'] = 'publish';
+        $wp_values['post_type']   = 'post';
+
+        if (isset($item->picture)) {
+            $pictureLocalPath = download_url($item->picture);
+            if (!is_wp_error($pictureLocalPath)) {
+                $wp_values['post_content'] = $this->addImageToPost($pictureLocalPath, $wp_values['post_content']);
+            }
+        }
+
+        if (!$postId = $this->save($wp_values)) {
+            return false;
+        }
+
+        return $postId;
+    }
+
+    /**
+     * This function adds an Image to Post Content
+     *
+     * @param $imageLocalPath
+     * @param $postContent
+     *
+     * @return string
+     */
+    private function addImageToPost($imageLocalPath, $postContent)
+    {
+        $fileUploaded = wp_upload_bits('attachment.jpg', null, file_get_contents($imageLocalPath));
+
+        if (!($fileUploaded['error'])) {
+            $imageDisplay = '<img src="' . $fileUploaded['url'] . '" class="attachment-post-thumbnail wp-post-image" alt>';
+            $postContent  = $imageDisplay . '<br><br />' . $postContent;
+        }
+
+        return $postContent;
+    }
+
+    /**
+     * This function saves the new Post into the DB
+     *
+     * @param $wp_values
+     *
+     * @return bool
+     */
+    private function save($wp_values)
+    {
+        $postId = wp_insert_post($wp_values);
+
+        if (!$postId || is_wp_error($postId)) {
+            return false;
+        }
+
+        return $postId;
     }
 
 }
