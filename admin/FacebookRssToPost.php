@@ -7,18 +7,12 @@ use includes\Repositories\PostRepository;
 use includes\Validators\Validator;
 
 /**
- * Main Class
+ * Class FacebookRssToPost
  *
+ * Main Class to initialise and control the plugin
  */
 class FacebookRssToPost
 {
-    /**
-     * A var to store the options in
-     *
-     * @var array
-     */
-    public $options;
-
     /**
      * A var to store the link to the plugin page
      *
@@ -27,7 +21,7 @@ class FacebookRssToPost
     public $page_link;
 
     /**
-     * Start and Initialise
+     * Start and Initialise the plugin
      *
      */
     function __construct()
@@ -71,8 +65,8 @@ class FacebookRssToPost
     }
 
     /**
-     * This function resolves the issue of Timeout being reached during Facebook API calls
-     * for slow connections
+     * This function resolves the issue of Timeout being reached
+     * during Facebook API calls for slow connections
      *
      * @param $timeout
      *

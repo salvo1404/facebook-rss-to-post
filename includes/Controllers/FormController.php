@@ -6,9 +6,10 @@ use includes\Repositories\PostRepositoryInterface;
 use includes\Validators\Validator;
 
 /**
- * Processes the admin screen form submissions
+ * Class FormController
  *
- * @author mobilova UG (haftungsbeschränkt) <rsspostimporter@feedsapi.com>
+ * Processes the setting screen form submissions
+ *
  */
 class FormController
 {
