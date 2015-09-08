@@ -39,13 +39,13 @@ class Validator
     /**
      * This function checks if a file has been uploaded
      *
-     * @param array $requestFiles
+     * @param array $requestFile
      *
      * @return bool
      */
-    public function validateJsonRequestFiles(array $requestFiles)
+    public function validateJsonRequestFile(array $requestFile)
     {
-        if(empty($requestFiles['import_json']['tmp_name'])){
+        if(empty($requestFile['import_json']['tmp_name'])){
             return false;
         }
 

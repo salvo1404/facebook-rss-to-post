@@ -51,7 +51,7 @@ class FormController
         // import from JSON File Submission
         if (isset($_POST['json_submission'])) {
 
-            if (!$this->validator->validateJsonRequestFiles($_FILES)) {
+            if (!$this->validator->validateJsonRequestFile($_FILES)) {
                 $this->respondWithError('file_not_found', 'Please Upload a Json File');
 
                 return;
