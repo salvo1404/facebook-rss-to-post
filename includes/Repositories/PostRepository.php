@@ -79,10 +79,7 @@ class PostRepository implements PostRepositoryInterface
         $wp_values['post_type']   = 'post';
 
         if (isset($item->picture)) {
-            $pictureLocalPath = download_url($item->picture);
-            if (!is_wp_error($pictureLocalPath)) {
-                $wp_values['post_content'] = $this->addImageToPost($pictureLocalPath, $wp_values['post_content']);
-            }
+            $wp_values['post_content'] = $this->addImageToPost($item->picture, $wp_values['post_content']);
         }
 
         if (!$postId = $this->save($wp_values)) {
@@ -118,10 +115,7 @@ class PostRepository implements PostRepositoryInterface
         $wp_values['post_type']   = 'post';
 
         if (isset($item->picture)) {
-            $pictureLocalPath = download_url($item->picture);
-            if (!is_wp_error($pictureLocalPath)) {
-                $wp_values['post_content'] = $this->addImageToPost($pictureLocalPath, $wp_values['post_content']);
-            }
+            $wp_values['post_content'] = $this->addImageToPost($item->picture, $wp_values['post_content']);
         }
 
         if (!$postId = $this->save($wp_values)) {
@@ -162,10 +156,7 @@ class PostRepository implements PostRepositoryInterface
         $wp_values['post_type']   = 'post';
 
         if (isset($item->picture)) {
-            $pictureLocalPath = download_url($item->picture);
-            if (!is_wp_error($pictureLocalPath)) {
-                $wp_values['post_content'] = $this->addImageToPost($pictureLocalPath, $wp_values['post_content']);
-            }
+            $wp_values['post_content'] = $this->addImageToPost($item->picture, $wp_values['post_content']);
         }
 
         if (!$postId = $this->save($wp_values)) {
@@ -178,19 +169,15 @@ class PostRepository implements PostRepositoryInterface
     /**
      * This function adds an Image to Post Content
      *
-     * @param $imageLocalPath
+     * @param $imageUrl
      * @param $postContent
      *
      * @return string
      */
-    private function addImageToPost($imageLocalPath, $postContent)
+    private function addImageToPost($imageUrl, $postContent)
     {
-        $fileUploaded = wp_upload_bits('attachment.jpg', null, file_get_contents($imageLocalPath));
-
-        if (!($fileUploaded['error'])) {
-            $imageDisplay = '<img src="' . $fileUploaded['url'] . '" class="attachment-post-thumbnail wp-post-image" alt>';
-            $postContent  = $imageDisplay . '<br><br />' . $postContent;
-        }
+        $imageDisplay = '<img src="' . $imageUrl . '" class="attachment-post-thumbnail wp-post-image" alt>';
+        $postContent  = $imageDisplay . '<br><br />' . $postContent;
 
         return $postContent;
     }
